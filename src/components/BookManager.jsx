@@ -1,7 +1,6 @@
-// src/components/BookManager.jsx
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBooks, addBook, updateBook } from "../features/books/bookSlice";
+import { fetchBooks, addBook, updateBook } from "../features/books/bookSlice"; // ✅ CORRECT CASE
 import { FaBook } from "react-icons/fa";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/config";
