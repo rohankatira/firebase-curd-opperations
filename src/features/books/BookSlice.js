@@ -36,7 +36,7 @@ export const updateBook = createAsyncThunk("books/updateBook", async (book) => {
 });
 
 // Slice
-const bookSlice = createSlice({
+const BookSlice = createSlice({
   name: "books",
   initialState: {
     list: [],
@@ -65,4 +65,4 @@ const bookSlice = createSlice({
   },
 });
 
-export default bookSlice.reducer;
+export default BookSlice.reducer;
