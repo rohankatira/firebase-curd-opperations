@@ -1,0 +1,146 @@
+:root {
+  --primary-color: #4b6cb7;
+  --secondary-color: #182848;
+  --accent-color: #f8d57e;
+  --light-color: #f8f9fa;
+  --dark-color: #343a40;
+}
+
+body {
+  background-color: #f5f7fa;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-container {
+  max-width: 450px;
+  margin: 0 auto;
+  padding: 40px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--primary-color), var(--secondary-color));
+}
+
+.logo-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.logo-text {
+  font-weight: 700;
+  color: var(--dark-color);
+  font-size: 1.8rem;
+  margin-bottom: 5px;
+}
+
+.logo-subtext {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.form-control {
+  border-radius: 5px;
+  padding: 12px 15px;
+  border: 1px solid #e1e5ee;
+  transition: all 0.3s;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.25rem rgba(75, 108, 183, 0.25);
+}
+
+.btn-login {
+  background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+  border: none;
+  padding: 12px;
+  font-weight: 600;
+  width: 100%;
+  border-radius: 5px;
+  transition: all 0.3s;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(75, 108, 183, 0.4);
+}
+
+.form-footer {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.form-footer a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.form-footer a:hover {
+  text-decoration: underline;
+}
+
+.input-group-text {
+  background-color: transparent;
+  border-right: none;
+}
+
+.input-group .form-control {
+  border-left: none;
+}
+
+.input-group:focus-within .input-group-text {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.book-decoration {
+  position: absolute;
+  opacity: 0.05;
+  z-index: -1;
+}
+
+.book-1 {
+  top: -50px;
+  right: -50px;
+  font-size: 15rem;
+  color: var(--primary-color);
+}
+
+.book-2 {
+  bottom: -30px;
+  left: -30px;
+  font-size: 10rem;
+  color: var(--secondary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .login-container {
+    padding: 30px 20px;
+    margin: 20px;
+  }
+
+  .logo-text {
+    font-size: 1.5rem;
+  }
+}

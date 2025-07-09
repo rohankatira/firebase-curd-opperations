@@ -1,126 +1,210 @@
 // src/components/BookManager.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchBooks,
-  addBook,
-  updateBook,
-  deleteBook,
-} from "../features/books/BookSlice";
+import { fetchBooks, addBook, updateBook } from "../features/books/bookSlice";
+import { FaBook } from "react-icons/fa";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase/config";
+import { showToast } from "../utils/toast";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 const BookManager = () => {
   const dispatch = useDispatch();
-  const { list: books } = useSelector((state) => state.books);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user = useSelector((state) => state.auth.user);
 
-  const [form, setForm] = useState({ title: "", author: "", year: "" });
+  const [form, setForm] = useState({
+    title: "",
+    author: "",
+    publishYear: "",
+    description: "",
+    status: "available",
+  });
+
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
-  const handleChange = (e) =>
+  useEffect(() => {
+    if (location.state?.book) {
+      const book = location.state.book;
+      setForm({
+        title: book.title,
+        author: book.author,
+        publishYear: book.publishYear,
+        description: book.description || "",
+        status: book.status || "available",
+      });
+      setEditingId(book.id);
+      navigate(location.pathname, { replace: true }); // Clear state
+    }
+  }, [location, navigate]);
+
+  const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
-  const handleAdd = () => {
-    const { title, author, year } = form;
-    if (title && author && year) {
-      dispatch(addBook({ title, author, year: Number(year) }));
-      setForm({ title: "", author: "", year: "" });
-    } else {
-      alert("All fields are required.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingId) {
+        await dispatch(updateBook({ id: editingId, ...form })).unwrap();
+        showToast("Book updated successfully!", "success");
+      } else {
+        await dispatch(addBook(form)).unwrap();
+        showToast("Book added successfully!", "success");
+      }
+
+      setForm({
+        title: "",
+        author: "",
+        publishYear: "",
+        description: "",
+        status: "available",
+      });
+      setEditingId(null);
+    } catch {
+      showToast("Failed to save book.", "danger");
     }
   };
 
-  const handleUpdate = (book) => {
-    const newTitle = prompt("New Title:", book.title);
-    const newAuthor = prompt("New Author:", book.author);
-    const newYear = prompt("New Year:", book.year);
-    if (newTitle && newAuthor && newYear) {
-      dispatch(updateBook({ id: book.id, data: { title: newTitle, author: newAuthor, year: Number(newYear) } }));
-    }
-  };
-
-  const handleDelete = (id) => {
-    if (window.confirm("Are you sure you want to delete this book?")) {
-      dispatch(deleteBook(id));
-    }
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => showToast("Signed out successfully.", "info"))
+      .catch(() => showToast("Error signing out.", "danger"));
   };
 
   return (
-    <div className="container mt-4">
-      <h2 className="text-center mb-4">📚 Book Management</h2>
+    <div className="d-flex flex-column min-vh-100">
+      {/* Navbar */}
+      <nav
+        className="navbar navbar-dark sticky-top"
+        style={{ background: "linear-gradient(to right, #182848, #4b6cb7)" }}
+      >
+        <div className="container-fluid">
+          <a className="navbar-brand" href="#">
+            <FaBook className="me-2" /> BookManager
+          </a>
+          <div className="d-flex align-items-center gap-3">
+            <Link className="btn btn-outline-light" to="/books">View Books</Link>
+            {user && (
+              <div className="dropdown">
+                <a
+                  href="#"
+                  className="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                  data-bs-toggle="dropdown"
+                >
+                  <img
+                    src="https://i.pravatar.cc/32"
+                    width="32"
+                    height="32"
+                    className="rounded-circle me-2"
+                    alt="avatar"
+                  />
+                  <strong>{user.displayName || "Librarian"}</strong>
+                </a>
+                <ul className="dropdown-menu dropdown-menu-dark text-small shadow">
+                  <li><a className="dropdown-item" href="#">Profile</a></li>
+                  <li><a className="dropdown-item" href="#">Settings</a></li>
+                  <li><hr className="dropdown-divider" /></li>
+                  <li>
+                    <a className="dropdown-item" href="#" onClick={handleLogout}>
+                      Sign out
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
+        </div>
+      </nav>
 
-      {/* Add Book Form */}
-      <div className="card shadow-sm mb-4">
-        <div className="card-header bg-primary text-white">Add New Book</div>
-        <div className="card-body">
-          <div className="row g-3">
-            <div className="col-md-4">
+      {/* Book Form */}
+      <div className="container d-flex justify-content-center align-items-center flex-grow-1 mt-5 mb-4">
+        <div className="card shadow-lg border-0 rounded-4 p-5" style={{ maxWidth: "700px", width: "100%" }}>
+          <h4 className="mb-4 fw-semibold text-primary text-center">
+            {editingId ? "Edit Book" : "Add New Book"}
+          </h4>
+          <form onSubmit={handleSubmit} className="row g-4">
+            <div className="col-12">
+              <label className="form-label">Book Title</label>
               <input
-                type="text"
+                className="form-control rounded-3"
                 name="title"
-                className="form-control"
-                placeholder="Title"
                 value={form.title}
                 onChange={handleChange}
+                required
               />
             </div>
-            <div className="col-md-4">
+            <div className="col-12">
+              <label className="form-label">Author Name</label>
               <input
-                type="text"
+                className="form-control rounded-3"
                 name="author"
-                className="form-control"
-                placeholder="Author"
                 value={form.author}
                 onChange={handleChange}
+                required
               />
             </div>
-            <div className="col-md-3">
+            <div className="col-md-6">
+              <label className="form-label">Publish Year</label>
               <input
+                className="form-control rounded-3"
+                name="publishYear"
                 type="number"
-                name="year"
-                className="form-control"
-                placeholder="Year"
-                value={form.year}
+                value={form.publishYear}
                 onChange={handleChange}
+                required
               />
             </div>
-            <div className="col-md-1 d-grid">
-              <button className="btn btn-success" onClick={handleAdd}>
-                ➕ Add
+            <div className="col-md-6">
+              <label className="form-label">Status</label>
+              <select
+                className="form-select rounded-3"
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+              >
+                <option value="available">Available</option>
+                <option value="borrowed">Borrowed</option>
+              </select>
+            </div>
+            <div className="col-12">
+              <label className="form-label">Description</label>
+              <textarea
+                className="form-control rounded-3"
+                name="description"
+                value={form.description}
+                onChange={handleChange}
+                rows="4"
+                placeholder="Optional description..."
+              ></textarea>
+            </div>
+            <div className="col-12">
+              <button className="btn btn-primary w-100 rounded-3" type="submit">
+                {editingId ? "Update Book" : "Add Book"}
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </div>
 
-      {/* Book List */}
-      <div className="row row-cols-1 row-cols-md-2 g-4">
-        {books.map((book) => (
-          <div className="col" key={book.id}>
-            <div className="card h-100 shadow-sm">
-              <div className="card-body">
-                <h5 className="card-title">{book.title}</h5>
-                <p className="card-text mb-1"><strong>Author:</strong> {book.author}</p>
-                <p className="card-text"><strong>Year:</strong> {book.year}</p>
-              </div>
-              <div className="card-footer d-flex justify-content-between">
-                <button
-                  className="btn btn-sm btn-outline-primary"
-                  onClick={() => handleUpdate(book)}
-                >
-                  ✏️ Edit
-                </button>
-                <button
-                  className="btn btn-sm btn-outline-danger"
-                  onClick={() => handleDelete(book.id)}
-                >
-                  🗑️ Delete
-                </button>
-              </div>
-            </div>
+      {/* Footer */}
+      <footer
+        className="footer mt-auto py-3"
+        style={{ background: "linear-gradient(to right, #182848, #4b6cb7)" }}
+      >
+        <div className="container d-flex justify-content-between text-white">
+          <span>© 2025 BookManager - Library Management System</span>
+          <div>
+            <a href="#" className="text-white me-3">Privacy Policy</a>
+            <a href="#" className="text-white">Terms of Service</a>
           </div>
-        ))}
-      </div>
+        </div>
+      </footer>
     </div>
   );
 };

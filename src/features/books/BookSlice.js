@@ -1,30 +1,41 @@
-// src/redux/bookSlice.js
+// src/features/books/bookSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import { db } from "../../firebase/config";
 
+// Collection reference
 const booksCollection = collection(db, "books");
 
-export const fetchBooks = createAsyncThunk("books/fetch", async () => {
+// Async Thunks
+export const fetchBooks = createAsyncThunk("books/fetchBooks", async () => {
   const snapshot = await getDocs(booksCollection);
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
 });
 
-export const addBook = createAsyncThunk("books/add", async (book) => {
+export const addBook = createAsyncThunk("books/addBook", async (book) => {
   const docRef = await addDoc(booksCollection, book);
   return { id: docRef.id, ...book };
 });
 
-export const deleteBook = createAsyncThunk("books/delete", async (id) => {
+export const deleteBook = createAsyncThunk("books/deleteBook", async (id) => {
   await deleteDoc(doc(db, "books", id));
   return id;
 });
 
-export const updateBook = createAsyncThunk("books/update", async ({ id, data }) => {
+export const updateBook = createAsyncThunk("books/updateBook", async (book) => {
+  const { id, ...data } = book;
   await updateDoc(doc(db, "books", id), data);
-  return { id, data };
+  return book;
 });
 
+// Slice
 const bookSlice = createSlice({
   name: "books",
   initialState: {
@@ -34,7 +45,11 @@ const bookSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchBooks.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchBooks.fulfilled, (state, action) => {
+        state.loading = false;
         state.list = action.payload;
       })
       .addCase(addBook.fulfilled, (state, action) => {
@@ -44,10 +59,8 @@ const bookSlice = createSlice({
         state.list = state.list.filter((book) => book.id !== action.payload);
       })
       .addCase(updateBook.fulfilled, (state, action) => {
-        const index = state.list.findIndex((book) => book.id === action.payload.id);
-        if (index !== -1) {
-          state.list[index] = { id: action.payload.id, ...action.payload.data };
-        }
+        const index = state.list.findIndex((b) => b.id === action.payload.id);
+        if (index !== -1) state.list[index] = action.payload;
       });
   },
 });
