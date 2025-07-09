@@ -1,7 +1,7 @@
 // src/components/BooksList.jsx
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBooks, deleteBook } from "../features/books/bookSlice";
+import { fetchBooks, deleteBook } from "";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/config";
