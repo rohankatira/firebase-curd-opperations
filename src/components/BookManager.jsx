@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchBooks, addBook, updateBook } from "../features/books/bookSlice"; // ✅ CORRECT CASE
+import { fetchBooks, addBook, updateBook } from "../features/books/bookSlice"
 import { FaBook } from "react-icons/fa";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/config";
@@ -8,7 +8,7 @@ import { showToast } from "../utils/toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const BookManager = () => {
-  const dispatch = useDispatch();
+  const dispatch = useDispatch();``
   const navigate = useNavigate();
   const location = useLocation();
   const user = useSelector((state) => state.auth.user);
