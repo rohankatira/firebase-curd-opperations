@@ -1,4 +1,3 @@
-// src/features/books/bookSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   collection,
@@ -10,7 +9,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase/config";
 
-// Collection reference
+// Firestore collection reference
 const booksCollection = collection(db, "books");
 
 // Async Thunks
@@ -35,7 +34,7 @@ export const updateBook = createAsyncThunk("books/updateBook", async (book) => {
   return book;
 });
 
-// Slice
+// Slice definition
 const BookSlice = createSlice({
   name: "books",
   initialState: {
