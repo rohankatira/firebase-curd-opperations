@@ -23,16 +23,6 @@ A modern **Book Management System** built with **React.js**, **Redux Toolkit**, 
 
 ---
 
-### 🖼️ Screenshots
-
-<!-- You can insert screenshots here using Markdown image tags -->
-
-<!-- Example: -->
-
-<!-- ![Screenshot](./screenshots/home.png) -->
-
----
-
 ### 🛠️ Tech Stack
 
 * **React.js** (with Hooks)
